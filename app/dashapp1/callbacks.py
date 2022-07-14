@@ -1,38 +1,34 @@
-from datetime import datetime as dt
-
 from dash.dependencies import Input
 from dash.dependencies import Output
 from dash.dependencies import State
-from flask_login import current_user
-import pandas_datareader as pdr
+from collections import deque
+import random
+import plotly
+import plotly.graph_objs as go
 
+X = deque(maxlen = 20)
+X.append(1)
+
+Y = deque(maxlen = 20)
+Y.append(1)
 
 def register_callbacks(dashapp):
     @dashapp.callback(
-        Output('my-graph', 'figure'),
-        Input('my-dropdown', 'value'),
-        State('user-store', 'data'))
-    def update_graph(selected_dropdown_value, data):
-        df = pdr.get_data_yahoo(selected_dropdown_value, start=dt(2017, 1, 1), end=dt.now())
+        Output('live-graph', 'figure'),
+        [ Input('graph-update', 'n_intervals') ]
+    )
+    def update_graph_scatter(n):
+        X.append(X[-1]+1)
+        Y.append(random.randint(1,180))
+
+        data = plotly.graph_objs.Scatter(
+                x=list(X),
+                y=list(Y),
+                name='Scatter',
+                mode= 'lines+markers'
+        )
+
         return {
-            'data': [{
-                'x': df.index,
-                'y': df.Close
-            }],
-            'layout': {'margin': {'l': 40, 'r': 0, 't': 20, 'b': 30}}
+            'data': [data],
+            'layout': go.Layout(xaxis=dict(range=[min(X),max(X)]),yaxis = dict(range = [1, 180]),)
         }
-
-    @dashapp.callback(
-        Output('user-store', 'data'),
-        Input('my-dropdown', 'value'),
-        State('user-store', 'data'))
-    def cur_user(args, data):
-        if current_user.is_authenticated:
-            return current_user.username
-
-    @dashapp.callback(Output('username', 'children'), Input('user-store', 'data'))
-    def username(data):
-        if data is None:
-            return ''
-        else:
-            return f'Hello {data}'

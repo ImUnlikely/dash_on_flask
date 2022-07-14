@@ -1,9 +1,6 @@
 {% extends "base.html" %}
 
 {% block content %}
-{% if current_user.is_anonymous %}
-  <h1>Hello, stranger!</h1>
-{% else  %}
-  <h1>Hi, {{ current_user.username }}!</h1>
-{% endif %}
+<h2>test</h2>
+<a href="/dashboard">dashboard</a>
 {% endblock %}
