@@ -11,7 +11,7 @@ layout = html.Div(
                     "redraw": False,
                 },
                 "transition": {
-                    "duration": 250,
+                    "duration": 100,
                     "ease": 'linear',
                 },
             }
